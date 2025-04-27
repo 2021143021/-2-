@@ -34,6 +34,22 @@
 
 ---
 
+## 프로젝트 동작 흐름
+
+```
+[ 데이터 다운로드 ]
+        ↓
+[ 데이터 전처리 ]
+        ↓
+[ 모델 학습 (train.py) ]
+        ↓
+[ FastAPI 서버 구동 (main.py) ]
+        ↓
+[ 웹페이지(index.html)에서 리뷰 입력 → 예측 결과 출력 ]
+```
+
+---
+
 ## 폴더 구조
 
 ```
@@ -87,6 +103,19 @@ uvicorn main:app --reload --host 127.0.0.1 --port 8001
 
 ---
 
+## 모델 학습 설정
+
+- 모델: distilbert-base-uncased
+- 최대 입력 길이: 512 토큰
+- 학습 에폭(epoch): 1
+- 배치 크기: 16
+- 옵티마이저: AdamW
+- 러닝레이트: 5e-5
+- 손실 함수: CrossEntropyLoss
+- 평가 지표: Accuracy
+
+---
+
 ## API 사용 예시
 
 ### 엔드포인트
@@ -116,11 +145,31 @@ uvicorn main:app --reload --host 127.0.0.1 --port 8001
 
 ---
 
+## API 테스트 예시 (curl)
+
+```bash
+curl -X POST "http://127.0.0.1:8001/predict" -H "Content-Type: application/json" -d '{"text": "This restaurant was amazing!"}'
+```
+
+---
+
 ## 프론트엔드 예시 화면
 
 - 이름: 김병수
 - 학번: 2021143021
 - 리뷰 텍스트 입력 → "분석하기" 클릭 → 별점 및 신뢰도 결과 표시
+
+---
+
+## 모델 저장 경로
+
+- 학습 완료된 모델은 `sentiment_model/` 폴더에 저장됩니다.
+- 필수 파일 목록:
+  - `config.json`
+  - `model.safetensors`
+  - `tokenizer.json`
+  - `tokenizer_config.json`
+  - `vocab.txt`
 
 ---
 
@@ -144,9 +193,8 @@ app.add_middleware(
 
 ## 참고
 
-- 모델은 `sentiment_model/` 폴더 안에 위치해야 합니다.
-- 내부에는 `config.json`, `model.safetensors`, `tokenizer.json`, `vocab.txt` 등의 파일이 있어야 합니다.
-- 서버 주소(`http://127.0.0.1:8001/predict`)는 프론트엔드와 일치해야 합니다.
+- 서버 주소(`http://127.0.0.1:8001/predict`)는 프론트엔드의 fetch 요청 URL과 반드시 일치해야 합니다.
+- 로컬 테스트 후 배포 시에는 `CORS` 설정과 포트 설정을 주의해야 합니다.
 
 ---
 
